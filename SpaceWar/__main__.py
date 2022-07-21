@@ -4,6 +4,9 @@ import time
 import random
 pygame.font.init()
 
+# set up contants:
+
+# set up game window:
 WIDTH, HEIGHT = 750, 750
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SpaceWar")
@@ -27,6 +30,18 @@ YELLOW_BEAM = pygame.image.load("spacewar/assets/pixel_beam_yellow.png")
 BG = pygame.transform.scale(pygame.image.load("spacewar/assets/background-star.png"), (WIDTH, HEIGHT))
 
 class Beam:
+    """A visible, moving thing that participates in the game. The result of a vessel firing.
+    It has a position, a velocity, an image, and a color.
+    The responsibility of beam is to move itself, draw itself, and collisions and off_screen movement. It tracks its position
+    and velocity in 2d space.
+
+    Attributes:
+        x(int): the position along the x axis.
+        y(int): the position along the y axis.
+        img(file): the image file that displays.
+        mask(pygame 2D bitmask object): tracks collisions.
+    """
+
     def __init__(self, x, y, img):
         self.x = x
         self.y = y
@@ -47,6 +62,21 @@ class Beam:
 
 
 class Vessel:
+    """A visible, moving space vehicle that participates in the game.
+    It has a position, a velocity, an image, and a color.
+    The responsibility of beam is to draw itself, shoot, track a "cooldown" period, 
+    move its beams after firing them, and provide its own width and height.and collisions and off_screen movement. It tracks its position
+    and velocity in 2d space.
+
+    Attributes:
+        x(int): the position along the x axis.
+        y(int): the position along the y axis.
+        vessel_img(file): the image file that displays for the vessel.
+        beam_img(file): the image file that displays for the beam.
+        beams(list): a list of beams that are currently active.
+        cool_down_counter(int): the number of frames that the vessel has been cooling down.
+    """
+
     COOLDOWN = 30
 
     def __init__(self, x, y, health=100):
@@ -97,6 +127,18 @@ class Vessel:
     
 
 class Earthling(Vessel):
+    """A visible, moving space vehicle from Earth that participates in the game.
+    It has a position, a velocity, an image, and a color.
+    The responsibility of beam is to draw itself, move its beams, 
+    move its beams after firing them, and track its own health.
+
+    Attributes:
+        vessel_img(file): the image file that displays for the vessel.
+        beam_img(file): the image file that displays for the beam.
+        mask(pygame 2D bitmask object): tracks collisions.
+        max_health(int): the maximum health of the vessel.
+    """
+
     def __init__(self, x, y, health=100):
         super().__init__(x, y, health)
         self.vessel_img = YELLOW_SPACE_VESSEL
@@ -126,6 +168,16 @@ class Earthling(Vessel):
         pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.vessel_img.get_height() + 10, self.vessel_img.get_width() * (self.health/self.max_health), 10))
 
 class Alien(Vessel):
+    """A visible, moving Alien space vehicle that participates in the game.
+    It has a position, a velocity, and an image.
+    The responsibility of beam is to move itself, and fire its beams.
+
+    Attributes:
+        vessel_img(file): the image file that displays for the vessel.
+        beam_img(file): the image file that displays for the beam.
+        mask(pygame 2D bitmask object): tracks collisions.
+    """
+
     COLOR_MAP = {
         "red": (RED_SPACE_VESSEL, RED_BEAM),
         "green": (GREEN_SPACE_VESSEL, GREEN_BEAM),
@@ -148,6 +200,20 @@ class Alien(Vessel):
 
 
 def collide(obj1, obj2):
+    """An update action that handles interactions between the vessels and the beams.
+    
+    The responsibility of collide() is to handle the situation when the beam collides
+    with the vessel.
+
+    Arguments:
+        obj1(Vessel): the first vessel.
+        obj2(Beam): the beam.
+        
+    Returns:
+        bool: True if the beam collides with the vessel, False otherwise. 
+        (if the mask objects overlap, then the beam collides with the vessel)
+    """
+
     offset_x = obj2.x - obj1.x
     offset_y = obj2.y - obj1.y
     return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) != None
@@ -174,6 +240,7 @@ def main():
     lost = False
     lost_count = 0
 
+    # reload game graphics
     def redraw_window():
         WIN.blit(BG, (0,0))
         # draw text
@@ -194,6 +261,7 @@ def main():
 
         pygame.display.update()
 
+    # mainloop
     while run:
         clock.tick(FPS)
         redraw_window()
@@ -247,6 +315,7 @@ def main():
 
         earthling.move_beams(-beam_vel, aliens)
 
+# set up the game and menu
 def main_menu():
     title_font = pygame.font.SysFont("sansserif", 30)
     run = True
