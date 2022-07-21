@@ -1,4 +1,5 @@
 import pygame
+from pygame import mixer
 import os
 import time
 import random
@@ -25,6 +26,9 @@ RED_BEAM = pygame.image.load("spacewar/assets/pixel_beam_red.png")
 GREEN_BEAM = pygame.image.load("spacewar/assets/pixel_beam_green.png")
 BLUE_BEAM = pygame.image.load("spacewar/assets/pixel_beam_blue.png")
 YELLOW_BEAM = pygame.image.load("spacewar/assets/pixel_beam_yellow.png")
+
+#set up the music track
+SPACE_MUSIC = "spacewar/assets/starsong.mp3"
 
 # Background
 BG = pygame.transform.scale(pygame.image.load("spacewar/assets/background-star.png"), (WIDTH, HEIGHT))
@@ -236,6 +240,17 @@ def main():
     earthling = Earthling(300, 630)
 
     clock = pygame.time.Clock()
+
+    #has to be in .mp3 format
+    #has to be in same folder
+
+    pygame.mixer.init()
+    #load the music
+    pygame.mixer.music.load(SPACE_MUSIC)
+    # Setting the volume.
+    mixer.music.set_volume(0.7)
+    #play the music infinite
+    pygame.mixer.music.play(-1)
 
     lost = False
     lost_count = 0
